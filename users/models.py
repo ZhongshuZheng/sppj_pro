@@ -9,7 +9,7 @@ class User(models.Model):
     user_email = models.EmailField()
     user_idnumber = models.CharField(max_length=19)
     user_type = models.CharField(max_length=1, default='1')  # 0 is admin, and 1 is company
-    user_examiner_id = models.ForeignKey('self', null=True)
+    user_examiner_id = models.ForeignKey('self', null=True)  # too much 'id' here... ...
     user_examiner_time = models.DateField()
     user_examine_statue = models.CharField(max_length=1, default='1')
         # 1 is examining, 2 is examined, 3 is examine failed
