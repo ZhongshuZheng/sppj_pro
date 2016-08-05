@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'sppj_db',
         'USER': 'root',
-        'PASSWORD': '2525925', # root
+        'PASSWORD': 'root',  # root
         'HOST': '',
         'PORT': '',
     }
