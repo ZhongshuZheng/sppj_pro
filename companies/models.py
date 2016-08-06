@@ -12,7 +12,7 @@ class Company(models.Model):
     contacts = models.CharField(max_length=25, null=True)
     telephone = models.CharField(max_length=20, null=True)
     setupdate = models.DateField(null=True)
-    legalpersoncode = models.CharField(max_length=30, null=True)
+    legalpersoncode = models.CharField(max_length=30, null=True, unique=True)
     legalpersoncode_file = models.FileField(upload_to="/upload_file/", null=True)  # try and finish
     zipcode = models.CharField(max_length=6, null=True)
     superiordepartment = models.CharField(max_length=50, null=True)
@@ -44,6 +44,11 @@ class Company(models.Model):
     endtime = models.DateField(null=True)
     continuetimes = models.IntegerField(null=True)
     suggestion = models.TextField(null=True)
+    examiner = models.ForeignKey('users.User', null=True)
+    examiner_time = models.DateField()
+    examine_statue = models.CharField(max_length=1, default='1')
+        # 1 is examining, 2 is examined, 3 is examine failed
+    inblack = models.CharField(max_length=1, default=0)  # 0 is not, 1 is in
 
 
 class PeopleInfo(models.Model):
