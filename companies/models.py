@@ -71,11 +71,7 @@ class StackHolder(PeopleInfo):
     train_code = models.CharField(max_length=100, null=True)
     resume = models.TextField(null=True)
     company = models.ForeignKey('Company')
-    types = models.ManyToManyField('StackHolderType', null=True)
-
-
-class StackHolderType(models.Model):
-    name = models.CharField(max_length=1)   # 0, 1, 2
+    types = models.CharField(max_length=1, null=True)   # 0, 1, 2
 
 
 class Artisan(PeopleInfo):
