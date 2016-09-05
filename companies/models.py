@@ -43,12 +43,20 @@ class Company(models.Model):
     begintime = models.DateField(null=True)
     endtime = models.DateField(null=True)
     continuetimes = models.IntegerField(null=True)
-    suggestion = models.TextField(null=True)
     examiner = models.ForeignKey('users.User', null=True)
     examiner_time = models.DateField()
     examine_statue = models.CharField(max_length=1, default='1')
         # 1 is examining, 2 is examined, 3 is examine failed
-    inblack = models.CharField(max_length=1, default=0)  # 0 is not, 1 is in
+    inblack = models.CharField(max_length=1, default=0)  # 0 is not, 1 is in')
+    changewant = models.CharField(max_length=1, default=0)  # 0 is no, 1 is yes
+    changereason = models.TextField(null=True)
+    changewanttime = models.DateField(null=True)
+
+
+class Suggestion(models.Model):
+    connecter = models.CharField(max_length=50)
+    content = models.TextField()
+    company = models.ForeignKey('Company')
 
 
 class PeopleInfo(models.Model):
