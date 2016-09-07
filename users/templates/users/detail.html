@@ -1,0 +1,15 @@
+{% block content %}
+
+<form method="post" action={% url 'detail_message' %}>
+    {% csrf_token %}
+    {% for i in form %}
+        {{ i.name }}:
+        {% if i.name == 'signid' %}{{ i.value }}
+        {% else %}{{ i }}{{ i.errors }}
+        {% endif %}<br />
+    {% endfor %}
+    <input type="submit" value="Change it!" />
+    <input type="hidden" name="signid" value= "{{ form.signid.value }}" />
+</form>
+
+{% endblock %}

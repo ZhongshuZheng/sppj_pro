@@ -1,0 +1,18 @@
+{% block content %}
+
+<h1>Users</h1>
+<ul>
+{% for user in list %}
+    <li>{{ user.signid}} - {{ user.email }} - {{ user.idnumber }} - {{ user.company }} -
+        <form method="post" action={% url 'user_list' %}>
+            {% csrf_token %}
+            <input type="hidden" name="ad_signid" value="{{ user.signid }}" />
+            <input type="submit" value="Detail" />
+        </form>
+    </li>
+{% empty %}
+    <li>No users yet.</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

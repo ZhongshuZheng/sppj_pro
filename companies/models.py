@@ -23,7 +23,7 @@ class Company(models.Model):
     qualification_file = models.FileField(upload_to="/upload_file/", null=True)    # try and finish
     quality = models.CharField(max_length=25, null=True)
     quality_date = models.DateField(null=True)
-    quality_file = models.FileField(ull=True)
+    quality_file = models.FileField(null=True)
     artisan_sum = models.IntegerField(null=True)
     artisan_m_sum = models.IntegerField(null=True)
     artisan_h_sum = models.IntegerField(null=True)
@@ -43,7 +43,7 @@ class Company(models.Model):
     begintime = models.DateField(null=True)
     endtime = models.DateField(null=True)
     continuetimes = models.IntegerField(null=True)
-    examiner = models.ForeignKey('users.User', null=True)
+    examiner = models.ForeignKey('users.User', null=True, related_name="+")
     examiner_time = models.DateField()
     examine_statue = models.CharField(max_length=1, default='1')
         # 1 is examining, 2 is examined, 3 is examine failed
@@ -87,17 +87,17 @@ class Artisan(PeopleInfo):
     company = models.ForeignKey('Company')
 
 
-class Certificate(models.Modle):
+class Certificate(models.Model):
     num = models.CharField(max_length=100, null=True)
     time = models.DateField(null=True)
-    type = models.CharField(max_length=1, null=True)    # 0, 1
+    itype = models.CharField(max_length=1, null=True)    # 0, 1
     file = models.FileField(upload_to="/upload_file/", null=True)  # try and finish
     artisan = models.ForeignKey('Artisan')
 
 
 class Project(models.Model):
     name = models.CharField(max_length=100, null=True)
-    type = models.CharField(max_length=10, null=True)
+    itype = models.CharField(max_length=10, null=True)
     level = models.CharField(max_length=10, null=True)
     address = models.CharField(max_length=100, null=True)
     investment = models.DecimalField(max_digits=10, decimal_places=2, null=True)
