@@ -1,5 +1,7 @@
+# "##!" is need to be rewrite!!!
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, render_to_response, redirect
 from django.template import RequestContext
 from django.views.generic import ListView
@@ -7,7 +9,7 @@ from django.views.generic import ListView
 from sppj.tools import writelog
 from users.models import User, MyUserManager
 
-from django.contrib.auth import authenticate, get_user
+from django.contrib.auth import authenticate, get_user, login, logout
 
 
 # forms here:
@@ -28,6 +30,23 @@ class UserDetailForm(forms.ModelForm):
 
 
 # views here:
+def user_login(request):
+    logout(request)
+    error = '0'
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        if not User.objects.get(signid=username).itype == '2':
+            user = authenticate(signid=username, password=password)
+            if user is not None:
+                login(request, user)
+                writelog(request)
+                return render_to_response('index.html', context_instance=RequestContext(request))
+            error = '1'
+    writelog(request)
+    return render_to_response('users/login.html', {"error": error}, context_instance=RequestContext(request))
+
+
 def signup(request):
     if request.method == 'POST':
         form = signupForm(request.POST)
@@ -37,6 +56,10 @@ def signup(request):
                                         idnumber=form.cleaned_data['idnumber'],
                                         password=form.cleaned_data['password'],
                                         itype=form.cleaned_data['itype'])
+            user = authenticate(signid=form.cleaned_data['signid'], password=form.cleaned_data['password'])
+            login(request, user)
+            writelog(request)
+            return render_to_response("index.html", context_instance=RequestContext(request))
         # else:
         #     # show errors to console:
         #     for i in form.errors:
@@ -44,7 +67,7 @@ def signup(request):
     else:
         form = signupForm()
     writelog(request)  # give the log
-    return render_to_response("users/signup.html", {'form': form}, context_instance=RequestContext(request))
+    return render_to_response("users/login.html", {'form': form}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -58,7 +81,7 @@ def detail_message(request, ad_signid=''):
     if request.method == 'POST':
         form = UserDetailForm(request.POST)
         form.full_clean()
-        if 'email' not in form.errors:
+        if 'email' not in form.errors and 'idnumber' not in form.errors:
             MyUserManager().change_user(signid=form.data['signid'],
                                         email=form.cleaned_data['email'],
                                         idnumber=form.cleaned_data['idnumber'])
@@ -75,7 +98,7 @@ class UserListView(ListView):
     The view about the list of users for admin.
     """
     model = User
-    template_name = 'users\user_list.html'
+    tempplate_name = 'users\user_list.html'
     context_object_name = "list"    # default = object_list
 
     def dispatch(self, request, *args, **kwargs):
@@ -93,4 +116,30 @@ class UserListView(ListView):
     def get_context_data(self, **kwargs):
         # have nothing else done...
         context = super(UserListView, self).get_context_data(**kwargs)
+        context['list'] = User.objects.filter(itype='1')
         return context
+
+
+# ajax
+def user_repeat_ajax(request):
+    # the ajax view for weather user repeat or not
+    fieldValue = request.GET['fieldValue']
+    fieldId = request.GET['fieldId']
+
+    if User.objects.filter(signid=fieldValue):
+        no_repeat = False
+    else:
+        no_repeat = True
+    results = [fieldId, no_repeat]
+    return JsonResponse(results, safe=False)
+
+
+def user_delete_ajax(request):
+    # the ajax view for weather user repeat or not
+    if not request.user.is_authenticated() or not request.user.itype == '1':  # ##! change it to 0 !!!!!
+        return redirect('index')
+
+    user = User.objects.get(signid=request.GET['del_id'])
+    user.itype = '2'
+    user.save()
+    return JsonResponse({}, safe=False)

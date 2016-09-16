@@ -39,7 +39,7 @@ class User(AbstractBaseUser):
     # password = models.CharField(max_length=25)
     email = models.EmailField()
     idnumber = models.CharField(max_length=19, default="")
-    itype = models.CharField(max_length=1, default='1')  # 0 is admin, and 1 is company
+    itype = models.CharField(max_length=1, default='1')  # 0 is admin, and 1 is company, 2 is deleted
     company = models.ForeignKey('companies.Company', null=True)
     passkey = models.CharField(max_length=30, null=True)
     is_active = models.BooleanField(default=True)

@@ -131,3 +131,8 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'users.User'
 
 LOGIN_URL = "/users/login/"
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "assets"),   # What is the f**k here!!!
+)

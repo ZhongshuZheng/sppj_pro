@@ -1,18 +1,246 @@
-{% block content %}
+{% extends "base.html" %}
+{% load staticfiles %}
 
-<h1>Users</h1>
-<ul>
-{% for user in list %}
-    <li>{{ user.signid}} - {{ user.email }} - {{ user.idnumber }} - {{ user.company }} -
-        <form method="post" action={% url 'user_list' %}>
-            {% csrf_token %}
-            <input type="hidden" name="ad_signid" value="{{ user.signid }}" />
-            <input type="submit" value="Detail" />
-        </form>
+{% block title %}Index{% endblock title %}
+
+{% block breadcurmb %}
+<ul class="breadcrumb">
+    <li>
+        <i class="ace-icon fa fa-home home-icon"></i>
+        <a href={% url 'index' %}>Home</a>
     </li>
-{% empty %}
-    <li>No users yet.</li>
-{% endfor %}
-</ul>
+    <li class="active">用户列表</li>
+</ul><!-- /.breadcrumb -->
+{% endblock breadcurmb %}
 
-{% endblock %}
+{% block content %}
+<h3 class="header smaller lighter blue">用户列表</h3>
+<div class="table-header">
+    Results for "Latest Registered Domains"
+</div>
+
+<!-- <div class="table-responsive"> -->
+
+<!-- <div class="dataTables_borderWrap"> -->
+<div>
+    <table id="ajax_list" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="center">
+                    <label class="position-relative">
+                        <input type="checkbox" class="ace" />
+                        <span class="lbl"></span>
+                    </label>
+                </th>
+                <th>用户名</th>
+                <th>身份证号</th>
+                <th class="hidden-480">Email</th>
+                <th>
+                    已关联公司
+                </th>
+                <th>操作</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for user in list %}
+            <tr id={{ user.signid }}>
+                <td class="center">
+                    <label class="position-relative">
+                        <input type="checkbox" class="ace" />
+                        <span class="lbl"></span>
+                    </label>
+                </td>
+
+                <td>{{ user.signid }}</td>
+                <td>{{ user.idnumber }}</td>
+                <td class="hidden-480">{{ user.email }}</td>
+                <td>{{ user.company }}</td>
+                <td>
+                    <div class="hidden-sm hidden-xs action-buttons">
+                        <form class="form-inline" method="post" action={% url 'user_list' %}>
+                            {% csrf_token %}
+                            <input type="hidden" name="ad_signid" value="{{ user.signid }}" />
+                            <input type="submit" class="btn btn-info btn-minier" value="Detail" />
+                            <button name="{{ user.signid }}" type="button" class="btn btn-danger btn-minier del_ajax">Delete</button>
+                        </form>
+                    </div>
+
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="dialog-confirm" class="hide">
+        <div class="alert alert-info bigger-110">
+            These items will be permanently deleted and cannot be recovered.
+        </div>
+
+        <div class="space-6"></div>
+
+        <p class="bigger-110 bolder center grey">
+            <i class="ace-icon fa fa-hand-o-right blue bigger-120"></i>
+            Are you sure?
+        </p>
+    </div><!-- #dialog-confirm -->
+
+{% endblock content %}
+
+{% block other_js %}
+
+<script>
+    jQuery(function($) {
+        // TO set the nav_left_list; it will be rewrite in every page
+        $('#nav_list_userlist').attr('class', 'active');
+    })
+</script>
+
+<!-- page specific plugin scripts -->
+<script src={% static "js/jquery.dataTables.min.js" %}></script>
+<script src={% static "js/jquery.dataTables.bootstrap.js" %}></script>
+
+
+<script src={% static "js/jquery-ui.min.js" %} ></script>
+<script src={% static "js/jquery.ui.touch-punch.min.js" %} ></script>
+
+<!-- inline scripts related to this page -->
+<script type="text/javascript">
+    jQuery(function($) {
+        var oTable1 =
+        $('#ajax_list')
+        //.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+        .dataTable( {
+            bAutoWidth: false,
+            "aoColumns": [
+              { "bSortable": false },
+              null, null,null, null,        // Here is very important for me to build table!!!!!!
+              { "bSortable": false }
+            ],
+            "aaSorting": [],
+
+            //,
+            //"sScrollY": "200px",
+            //"bPaginate": false,
+
+            //"sScrollX": "100%",
+            //"sScrollXInner": "120%",
+            //"bScrollCollapse": true,
+            //Note: if you are applying horizontal scrolling (sScrollX) on a ".table-bordered"
+            //you may want to wrap the table inside a "div.dataTables_borderWrap" element
+
+            //"iDisplayLength": 50
+        } );
+        /**
+        var tableTools = new $.fn.dataTable.TableTools( oTable1, {
+            "sSwfPath": "../../copy_csv_xls_pdf.swf",
+            "buttons": [
+                "copy",
+                "csv",
+                "xls",
+                "pdf",
+                "print"
+            ]
+        } );
+        $( tableTools.fnContainer() ).insertBefore('#ajax_list');
+        */
+
+
+        $(document).on('click', 'th input:checkbox' , function(){
+            var that = this;
+            $(this).closest('table').find('tr > td:first-child input:checkbox')
+            .each(function(){
+                this.checked = that.checked;
+                $(this).closest('tr').toggleClass('selected');
+            });
+        });
+
+
+        $('[data-rel="tooltip"]').tooltip({placement: tooltip_placement});
+        function tooltip_placement(context, source) {
+            var $source = $(source);
+            var $parent = $source.closest('table')
+            var off1 = $parent.offset();
+            var w1 = $parent.width();
+
+            var off2 = $source.offset();
+            //var w2 = $source.width();
+
+            if( parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2) ) return 'right';
+            return 'left';
+        }
+
+    })
+</script>
+
+<!-- Delete User -->
+{#<script>#}
+{##}
+{#    $(document).ready(function(){#}
+{#      $(".del_ajax1").click(function(){#}
+{#        $del_name = $(this).attr('name');   // so beautiful here!#}
+{#        $.ajax({#}
+{#            url: '{% url 'user_delete_ajax' %}',#}
+{#            context: '',#}
+{#            type: "GET",#}
+{#            dataType: "html",#}
+{#            data: {'del_id': $del_name},#}
+{#            success: function(ans){#}
+{#                // $("#ajax_list").html(ans);#}
+{#                $('#ajax_list').dataTable().fnDeleteRow($("#" + $del_name));#}
+{#                // $("#" + $del_name).remove();#}
+{#            }#}
+{#        });#}
+{#      });#}
+{#    });#}
+{#</script>#}
+
+<script type="text/javascript">
+        jQuery(function($) {
+
+            $(".del_ajax").on('click', function (e) {
+                e.preventDefault();
+
+                $del_name = $(this).attr('name');   // so beautiful here!
+
+                $("#dialog-confirm").removeClass('hide').dialog({
+                    resizable: false,
+                    modal: true,
+                    title: "",
+                    buttons: [
+                        {
+                            html: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; Delete all items",
+                            "class": "btn btn-danger btn-xs",
+                            click: function () {
+                                $(this).dialog("close");
+                                $.ajax({
+                                    url: '{% url 'user_delete_ajax' %}',
+                                    context: '',
+                                    type: "GET",
+                                    dataType: "html",
+                                    data: {'del_id': $del_name},
+                                    success: function(ans){
+                                        // $("#ajax_list").html(ans);
+                                        $('#ajax_list').dataTable().fnDeleteRow($("#" + $del_name));
+                                        // $("#" + $del_name).remove();
+                                    }
+                                });
+                            }
+                        }
+                        ,
+                        {
+                            html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; Cancel",
+                            "class": "btn btn-xs",
+                            click: function () {
+                                $(this).dialog("close");
+                            }
+                        }
+                    ]
+                });
+            });
+        })
+    </script>
+
+{% endblock other_js%}

@@ -20,5 +20,6 @@ from sppj.views import *
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^users/', include('users.urls')),
+    url(r'^users/', include('companies.urls')),
     url(r'^index/', index, name='index'),
 ]

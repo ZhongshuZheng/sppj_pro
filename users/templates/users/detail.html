@@ -1,15 +1,51 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block title %}Index{% endblock title %}
+
+{% block breadcurmb %}
+<ul class="breadcrumb">
+    <li>
+        <i class="ace-icon fa fa-home home-icon"></i>
+        <a href={% url 'index' %}>Home</a>
+    </li>
+    <li class="active">用户详情</li>
+</ul><!-- /.breadcrumb -->
+{% endblock breadcurmb %}
+
 {% block content %}
-
-<form method="post" action={% url 'detail_message' %}>
+<div class="page-header">
+    <h1>
+        用户详情
+    </h1>
+</div><!-- /.page-header -->
+<form class="form-horizontal validationE" role="form"  method="post" action={% url 'detail_message' %}>
     {% csrf_token %}
-    {% for i in form %}
-        {{ i.name }}:
-        {% if i.name == 'signid' %}{{ i.value }}
-        {% else %}{{ i }}{{ i.errors }}
-        {% endif %}<br />
-    {% endfor %}
-    <input type="submit" value="Change it!" />
-    <input type="hidden" name="signid" value= "{{ form.signid.value }}" />
-</form>
+    <!-- #section:elements.form -->
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 用户名 </label>
 
-{% endblock %}
+        <div class="col-sm-9">
+            <input name="signid" value="{{ form.signid.value }}" type="text" id="form-field-1" readonly="" class="col-xs-10 col-sm-5" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-2"> 身份证号 </label>
+
+        <div class="col-sm-9">
+            <input name="idnumber" value="{{ form.idnumber.value }}" type="text" id="form-field-2" placeholder="" class="col-xs-10 col-sm-5" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-3"> Email </label>
+        <div class="col-sm-9">
+            <input name="email" value="{{ form.email.value }}" type="text" id="form-field-3" placeholder="" class="col-xs-10 col-sm-5" />
+        </div>
+    </div>
+
+    <div class="form-actions center">
+        <input type="submit" class="btn btn-warning" value="修改">&nbsp;&nbsp;&nbsp;
+        <a class="btn btn-info" href="{% url 'user_list' %}">返回</a>
+    </div>
+</form>
+{% endblock content %}
