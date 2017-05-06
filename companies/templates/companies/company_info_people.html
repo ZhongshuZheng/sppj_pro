@@ -1,0 +1,541 @@
+{% extends base %}
+{% load staticfiles %}
+
+{% block other_css %}
+<link rel="stylesheet" href="{% static "css/datepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/bootstrap-timepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/daterangepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/bootstrap-datetimepicker.css" %}" />
+{% endblock other_css %}
+
+{% block breadcurmb_detail %}
+    <li><a href={% url 'company_info_peoples_write' %}>编制技术人员列表</a></li>
+    <li class="active">技术人员详情</li>    <!-- ##! maybe need to change here! -->
+{% endblock breadcurmb_detail %}
+
+{% block content %}
+    {% block menu_nav %}
+<div class="page-header">
+    <ul class="nav nav-pills">
+        <li>
+            <a href={% url 'company_info_write' %}>单位基本情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_papers_write' %}>单位相关证明</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_stackholders_write' %}>干系人情况</a>
+        </li>
+        <li class="active">
+            <a href={% url 'company_info_peoples_write' %}>技术人员情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_projects_write' %}>单位业绩情况</a>
+        </li>
+    </ul>
+</div><!-- /.page-header -->
+
+{% endblock menu_nav %}
+
+{% if success == 1 %}
+<div class="alert alert-block alert-success">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-check"></i>
+            修改成功!
+        </strong>
+    </p>
+</div>
+{% elif success == 2 %}
+<div class="alert alert-block alert-danger">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-times"></i>
+            保存失败！
+        </strong>
+        您的身份证号在数据库中重复！
+    </p>
+</div>
+{% elif success == 3 %}
+<div class="alert alert-block alert-danger">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-times"></i>
+            保存失败！
+        </strong>
+        请提交100M以内的文件。
+    </p>
+</div>
+{% endif %}
+
+<form id="pw2_form" class="form-horizontal validationE" role="form"  method="post" enctype="multipart/form-data" action={% url 'company_info_peoples_detail_write' %} >
+    {% csrf_token %}
+    <!-- #section:elements.form -->
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 姓名</label>
+        <div class="col-sm-9">
+            <input name="{{ form.name.name }}" value="{{ form.name.value|default:"" }}" type="text" id="form-field-1"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[15]] readonly_if" />
+        </div>
+    </div>
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="select-2"> 性别</label>#}
+{#        <div class="col-sm-9">#}
+{#            <select name="{{ form.sex.name }}" value="{{ form.sex.value|default:"" }}" type="text" id="select-2"#}
+{#                   class="col-xs-10 col-sm-5 validate[required] readonly_if" >#}
+{#                <option value="男">男</option>#}
+{#                <option value="女">女</option>#}
+{#            </select>#}
+{#        </div>#}
+{#    </div>#}
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right">性别</label>
+        <div class="col-sm-9 form-inline">
+            <div class="radio">
+                <label>
+                    <input name="{{ form.sex.name }}" type="radio" class="ace validate[required] readonly_if" value="男"
+                    {% if form.sex.value == '男' %}checked{% endif %} />
+                    <span class="lbl"> 男</span>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input name="{{ form.sex.name }}" type="radio" class="ace readonly_if" value="女"
+                    {% if form.sex.value == '女' %}checked{% endif %} />
+                    <span class="lbl"> 女</span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-37"> 出生日期 </label>
+        <div class="col-sm-9">
+            <div class="col-xs-10 col-sm-5  input-group">
+                <input name="{{ form.birthd.name }}" value="{{ form.birthd.value|date:"Y-m-d"|default:"" }}"
+                       class="form-control date-picker validate[required] readonly_if" id="form-field-37" type="text" data-date-format="yyyy-mm-dd" />
+                <span class="input-group-addon">
+                    <i class="fa fa-clock-o bigger-110"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="select-1"> 职称</label>
+        <div class="col-sm-9">
+            <select name="{{ form.title.name }}" value="{{ form.title.value|default:"" }}" type="text" id="select-1"
+                   class="col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">----</option>
+                <option value="教授">教授</option>
+                <option value="高级工程师">高级工程师</option>
+                <option value="工程师">工程师</option>
+				<option value="助理工程师">助理工程师</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="select-1s"> 职称专业</label>
+        <div class="col-sm-9">
+            <select name="{{ form.titlemajor.name }}" value="{{ form.titlemajor.value|default:"" }}" type="text" id="select-1s"
+                   class="col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">----</option>
+                <option value="水土保持类">水土保持类</option>
+                <option value="水利工程类">水利工程类</option>
+                <option value="资源环境类">资源环境类</option>
+				<option value="其他土木工程类">其他土木工程类</option>
+				<option value="非上述类别">非上述类别</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-5"> 职称证书</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="id-input-file-5" class="input_file readonly_if file_check" name="{{ form.title_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.title_file.value %}
+        <a href="{% url 'file_download' %}?PersonKey={{ form.idnum.value }}&FileName=title_file&Artisan=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.title_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="select-3"> 学历</label>
+        <div class="col-sm-9">
+            <select name="{{ form.education.name }}" value="{{ form.education.value|default:"" }}" type="text" id="select-3"
+                   class="col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">----</option>
+                <option value="博士研究生">博士研究生</option>
+                <option value="硕士研究生">硕士研究生</option>
+                <option value="大学本科">大学本科</option>
+                <option value="大学专科">大学专科</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="select-4"> 毕业专业</label>
+        <div class="col-sm-9">
+            <select name="{{ form.major.name }}" value="{{ form.major.value|default:"" }}" type="text" id="select-4"
+                   class="col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">----</option>
+                <option value="水土保持类">水土保持类</option>
+                <option value="水利工程类">水利工程类</option>
+                <option value="资源环境类">资源环境类</option>
+				<option value="其他土木工程类">其他土木工程类</option>
+				<option value="非上述类别">非上述类别</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-9"> 毕业证书</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="id-input-file-9" class="input_file readonly_if file_check" name="{{ form.major_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.major_file.value %}
+        <a href="{% url 'file_download' %}?PersonKey={{ form.idnum.value }}&FileName=major_file&Artisan=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.major_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-13"> 身份证号</label>
+        <div class="col-sm-9">
+            <input name="{{ form.idnum.name }}" value="{{ form.idnum.value|default:"" }}" type="text" id="form-field-13"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[18],minSize[18]] readonly_if" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-11"> 身份证</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="id-input-file-11" class="input_file readonly_if file_check" name="{{ form.idnum_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.idnum_file.value %}
+        <a href="{% url 'file_download' %}?PersonKey={{ form.idnum.value }}&FileName=idnum_file&Artisan=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.idnum_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-22"> 在职证明</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="id-input-file-22" class="input_file readonly_if file_check" name="{{ form.onjob_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.onjob_file.value %}
+        <a href="{% url 'file_download' %}?PersonKey={{ form.idnum.value }}&FileName=onjob_file&Artisan=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.onjob_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-1"></div>
+        <div class="col-xs-9">
+            <h3 class="row header smaller lighter blue">
+                <span class="col-sm-7">
+                    <i class="ace-icon fa fa-th-large"></i>
+                    培训证书
+                </span><!-- /.col -->
+                {% if examine_statue == '3' %}
+                <span class="col-sm-5">
+                    <label class="pull-right inline">
+                        <small class="muted">是否拥有:</small>
+
+                        <input id="id-pills-stacked0" name="{{ form.file_0.name }}" type="checkbox" class="ace ace-switch ace-switch-5" {% if f0.file.value %}checked{% endif %} />
+                        <span class="lbl middle"></span>
+                    </label>
+                </span><!-- /.col -->
+                {% endif %}
+
+            </h3>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-17"> 培训证书编号</label>
+        <div class="col-sm-3">
+            <input name="{{ form.file_num0.name }}" value="{{ f0.num.value|default:"" }}" type="text" id="form-field-17"
+                   class="col-xs-10 col-sm-12 validate[required,maxSize[100]] readonly_if" />
+        </div>
+
+        <label class="col-sm-1 control-label no-padding-right" for="id-date-picker-18"> 取得时间</label>
+        <div class="col-sm-5">
+            <div class="col-sm-5 input-group">
+                <input name="{{ form.file_time0.name }}" value="{{ f0.time.value|date:"Y-m-d"|default:"" }}"
+                       class="form-control date-picker validate[required] readonly_if" id="id-date-picker-18" type="text" data-date-format="yyyy-mm-dd" />
+                <span class="input-group-addon">
+                    <i class="fa fa-clock-o bigger-110"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="input-filed-01"> 证书文件</label>
+
+        <div class="col-xs-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" id="input-filed-01" name="{{ form.file_file0.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if f0.file.value %}
+        <a href="{% url 'file_download' %}?PersonKey={{ form.idnum.value }}&FileType=0&Certificate=ye" target="_blank" class="ipreview" data-preview="/static/{{ f0.file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <div class="col-xs-1"></div>
+        <div class="col-xs-9">
+            <h3 class="row header smaller lighter blue">
+                <span class="col-sm-7">
+                    <i class="ace-icon fa fa-th-large"></i>
+                    注册水保工程师证书
+                </span><!-- /.col -->
+                {% if examine_statue == '3' %}
+                <span class="col-sm-5">
+                    <label class="pull-right inline">
+                        <small class="muted">是否拥有:</small>
+
+                        <input id="id-pills-stacked1" name="{{ form.file_1.name }}" type="checkbox" class="ace ace-switch ace-switch-5" {% if f1.file.value %}checked{% endif %} />
+                        <span class="lbl middle"></span>
+                    </label>
+                </span><!-- /.col -->
+                {% endif %}
+            </h3>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-20"> 注册水保工程师证书编号</label>
+        <div class="col-sm-3">
+            <input name="{{ form.file_num1.name }}" value="{{ f1.num.value|default:"" }}" type="text" id="form-field-20"
+                   class="col-xs-10 col-sm-12 validate[required,maxSize[100]] readonly_if" />
+        </div>
+
+        <label class="col-sm-1 control-label no-padding-right" for="id-date-picker-21"> 取得时间</label>
+        <div class="col-sm-5">
+            <div class="col-sm-5 input-group">
+                <input name="{{ form.file_time1.name }}" value="{{ f1.time.value|date:"Y-m-d"|default:"" }}"
+                       class="form-control date-picker validate[required] readonly_if" id="id-date-picker-21" type="text" data-date-format="yyyy-mm-dd" />
+                <span class="input-group-addon">
+                    <i class="fa fa-clock-o bigger-110"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="input-filed-02"> 证书文件</label>
+
+        <div class="col-xs-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" id="input-filed-02" name="{{ form.file_file1.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if f1.file.value %}
+        <a href="{% url 'file_download' %}?PersonKey={{ form.idnum.value }}&FileType=1&Certificate=ye" target="_blank" class="ipreview" data-preview="/static/{{ f1.file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+
+
+    <div class="form-actions center">
+        {% if examine_statue == '3' %}
+        <input type="hidden" name="ori_idnum" value='{{ form.idnum.value|default:"0"}}' />
+        <input id="submit_btn" type="button" class="btn btn-warning" value="保存">&nbsp;&nbsp;&nbsp;
+        {% endif %}
+    </div>
+
+</form>
+{% endblock content %}
+
+{% block other_js %}
+
+<script src="{% static "js/date-time/bootstrap-datepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/bootstrap-timepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/moment.min.js" %}" ></script>
+<script src="{% static "js/date-time/daterangepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/bootstrap-datetimepicker.min.js" %}" ></script>
+
+<script>
+
+$("document").ready(function(){
+    // init of the certificate
+    {% if not f0.file.value %}
+        $('#form-field-17').attr("disabled", "disabled");
+        $('#id-date-picker-18').attr("disabled", "disabled");
+        $('#input-filed-01').attr("disabled", "disabled");
+    {% endif %}
+    {% if not f1.file.value %}
+        $('#form-field-20').attr("disabled", "disabled");
+        $('#id-date-picker-21').attr("disabled", "disabled");
+        $('#input-filed-02').attr("disabled", "disabled");
+    {% endif %}
+
+    //set the file yes-or-not button
+    $("#id-pills-stacked0").click(function(){
+        if($(this).attr("checked")=="checked"){
+            $('#form-field-17').attr("disabled", "disabled");
+            $('#id-date-picker-18').attr("disabled", "disabled");
+            $('#input-filed-01').attr("disabled", "disabled");
+            $("#id-pills-stacked0").removeAttr("checked");
+        }else{
+            $('#form-field-17').removeAttr("disabled");
+            $('#id-date-picker-18').removeAttr("disabled");
+            $('#input-filed-01').removeAttr("disabled");
+            $("#id-pills-stacked0").attr("checked", "checked");
+        }
+    });
+    $("#id-pills-stacked1").click(function(){
+        if($(this).attr("checked")=="checked"){
+            $('#form-field-20').attr("disabled", "disabled");
+            $('#id-date-picker-21').attr("disabled", "disabled");
+            $('#input-filed-02').attr("disabled", "disabled");
+            $("#id-pills-stacked1").removeAttr("checked");
+        }else{
+            $('#form-field-20').removeAttr("disabled");
+            $('#id-date-picker-21').removeAttr("disabled");
+            $('#input-filed-02').removeAttr("disabled");
+            $("#id-pills-stacked1").attr("checked", "checked");
+        }
+    });
+});
+
+jQuery(function($) {
+
+    // If the message are submitted, make them readonly
+    {% if examine_statue != '3' %}
+    $('.readonly_if').attr('disabled', 'disabled');
+    {% endif %}
+
+    // unique idnum for first time
+    {% if firtstime == 1 %}
+    $('#form-field-13').attr('class', 'col-xs-10 col-sm-5 validate[required,maxSize[18],minSize[18],ajax[ajaxIdnumRepeatA]]');
+    {% endif %}
+
+    // file upload
+    $('.input_file ').ace_file_input({
+					no_file:'请选择文件！',
+					btn_choose:'选择',
+					btn_change:'选择',
+					droppable:false,
+					onchange:null,
+					thumbnail:false //| true | large
+					//whitelist:'gif|png|jpg|jpeg'
+					//blacklist:'exe|php'
+					//onchange:''
+					//
+				});
+    //pre-show a file name, for example a previously selected file
+    {% if f0.file.value %}
+        $('#input-filed-01').ace_file_input('show_file_list', ['已存在！']);
+        {% else %}
+        $('#input-filed-01').ace_file_input('show_file_list', ['请选择文件！']);
+    {% endif %}
+    {% if f1.file.value %}
+        $('#input-filed-02').ace_file_input('show_file_list', ['已存在！']);
+        {% else %}
+        $('#input-filed-02').ace_file_input('show_file_list', ['请选择文件！']);
+    {% endif %}
+    {% if form.title_file.value %}
+        $('#id-input-file-5').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.major_file.value %}
+        $('#id-input-file-9').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.idnum_file.value %}
+        $('#id-input-file-11').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.onjob_file.value %}
+        $('#id-input-file-22').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+
+    //check the files for the first time.
+    $('#submit_btn').click(function () {
+        emptyfile = 0;
+        {% if firtstime == 1 %}
+            $('.input_file').each(function () {
+                if ($(this).val() == ""){
+                    emptyfile = 1;
+                }
+            });
+        {% endif %}
+        {% if not f0.file.value %}
+        if ($("#id-pills-stacked0").attr("checked")=="checked" && $("#input-filed-01").val() == ""){
+            emptyfile = 1;
+        }
+        {% endif %}
+        {% if not f1.file.value %}
+        if ($("#id-pills-stacked1").attr("checked")=="checked" && $("#input-filed-02").val() == ""){
+            emptyfile = 1;
+        }
+        {% endif %}
+        if (emptyfile == 0)
+            $('#pw2_form').submit();
+        else {
+            // an gritter alert
+            $.gritter.add({
+                title: '修改失败！',
+                text: '请检查并选择所有需要的文件。',
+                class_name: 'gritter-error'
+            });
+
+            return false;
+        }
+    });
+
+
+    //datepicker plugin
+    //link
+    $('.date-picker').datepicker({
+        autoclose: true,
+        todayHighlight: true
+    })
+    //show datepicker when clicking on the icon
+    .next().on(ace.click_event, function(){
+        $(this).prev().focus();
+    });
+
+});
+
+//set the select input default
+//获得后台的值,把相应的select的option选为默认的值
+$(document).ready(function(){
+ selectCheckPayStats("select-1","{{ form.title.value|default:"" }}");
+{# selectCheckPayStats("select-2","{{ form.sex.value|default:"" }}");#}
+ selectCheckPayStats("select-3", "{{ form.education.value|default:"" }}");
+ selectCheckPayStats("select-4", "{{ form.major.value|default:"" }}");
+ selectCheckPayStats("select-1s", "{{ form.titlemajor.value|default:"" }}");
+});
+//修改select的option默认显示项的方法
+function selectCheckPayStats(id,value)
+{
+    //获得下拉列表的id
+    var select = document.getElementById(id);
+    //获得下拉列表的所有option
+    var options = select.options;
+    //循环获得对应的节点
+    for(var i=0;i<options.length;i++)
+    {
+     //获得节点的值和后台传来的值进行比较
+     if (options[i].value == value)
+     {
+      //如果当前节点与后台传来的值一致，则将当前节点设置为选中状态，并跳出循环
+      options[i].selected = true;
+      break;
+     }
+    }
+}
+</script>
+{% block menu_js %}
+<script>
+jQuery(function($) {
+    // TO set the nav_left_list; it will be rewrite in every page
+    $('#nav_list_companyinfo_info1').attr('class', '');
+    $('#nav_list_companyinfo_info').attr('class', 'active');
+});
+</script>
+{% endblock %}
+{% endblock %}

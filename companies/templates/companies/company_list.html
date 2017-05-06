@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{# #! in this page #}
+{#{% block title %}Index{% endblock title %}#}
+
+{% block breadcurmb %}
+    <li>
+        <i class="ace-icon fa fa-home home-icon"></i>
+        <a href={% url 'index' %}>申请须知</a>
+    </li>
+    <li class="active">公司申请</li>
+{% endblock breadcurmb %}
+
+{% block content %}
+<h3 class="header smaller lighter blue">公司申请</h3>
+
+<button class="btn btn-success btn-xs" id="new_company">
+<i class="ace-icon fa  fa-pencil-square-o bigger-160"></i>
+新建申请
+</button><br /><br />
+
+<div class="table-header">
+    申请单位列表（每个单位只允许申请一个项目）
+</div>
+
+<!-- <div class="table-responsive"> -->
+
+<!-- <div class="dataTables_borderWrap"> -->
+<div>
+    <table id="ajax_list" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="center">
+                    <label class="position-relative">
+                        <input type="checkbox" class="ace" />
+                        <span class="lbl"></span>
+                    </label>
+                </th>
+                <th>单位名称</th>
+                <th>法人代码</th>
+                <th class="hidden-480">联系人</th>
+                <th class="hidden-480">状态</th>
+                <th class="hidden-480">当前评分</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for c in company %}
+            <tr id={{ c.signid }}>
+                <td class="center">
+                    <label class="position-relative">
+                        <input type="checkbox" class="ace" />
+                        <span class="lbl"></span>
+                    </label>
+                </td>
+
+                <td>{{ c.name }}</td>
+                <td>{{ c.legalpersoncode }}</td>
+                <td class="hidden-480">{{ c.contacts }}</td>
+                <td class="hidden-480">{% if c.examine_statue == '1' %}审核中{% elif c.examine_statue == '2' %}审核通过{% else %}未提交{% endif %}</td>
+                <td class="hidden-480">{{ c.score|default:0 }}</td>
+                <td>
+                    <div class="hidden-sm hidden-xs action-buttons">
+                        {% if c.examine_statue == '3' %}
+                        <a href="{% url "company_info_write" %}" name="{{ user.signid }}" type="button" class="btn btn-info btn-minier">编辑</a>
+                        <button name="{{ c.id }}" type="button" class="btn btn-success btn-minier submit_ajax">提交</button>
+                        {% else %}
+                        <a href="{% url "company_info_write" %}" name="{{ user.signid }}" type="button" class="btn btn-warning btn-minier">查看</a>
+                            {% if c.changewant == '0' %}
+                            <button name="{{ c.id }}" type="button" class="btn btn-danger btn-minier change_ajax">申请修改</button>
+                            {% else %}
+                            <button name="{{ c.id }}" type="button" disabled="disabled" class="btn btn-danger btn-minier change_ajax">已申请修改</button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+<div id="dialog-confirm" class="hide">
+    <div class="alert alert-info bigger-110">
+        提交申请，请确保您的信息已经输入完全。提交后如有修改，则需要向水保学会进行修改申请。
+    </div>
+
+    <div class="space-6"></div>
+
+    <p class="bigger-110 bolder center grey">
+        <i class="ace-icon fa fa-hand-o-right blue bigger-120"></i>
+        确定提交吗？
+    </p>
+</div><!-- #dialog-confirm -->
+<div id="dialog-confirm2" class="hide">
+    <div class="alert alert-info bigger-110">
+        向水保学会管理员提出修改申请，申请后自行请与水保学会相关人员进行联系。
+    </div>
+
+    <div class="space-6"></div>
+
+    <p class="bigger-110 bolder center grey">
+        <i class="ace-icon fa fa-hand-o-right blue bigger-120"></i>
+        确定申请吗？
+    </p>
+</div><!-- #dialog-confirm -->
+
+
+{% endblock content %}
+
+{% block other_js %}
+
+<script>
+    jQuery(function($) {
+        // TO set the nav_left_list; it will be rewrite in every page
+        $('#nav_list_companyinfo_info_list').attr('class', 'active');
+    })
+</script>
+
+<!-- page specific plugin scripts -->
+<script src="{% static "js/jquery.dataTables.min.js" %}" ></script>
+<script src="{% static "js/jquery.dataTables.bootstrap.js" %}" ></script>
+
+
+<script src="{% static "js/jquery-ui.min.js" %}" ></script>
+<script src="{% static "js/jquery.ui.touch-punch.min.js" %}" ></script>
+
+<!-- inline scripts related to this page -->
+<script type="text/javascript">
+
+    jQuery(function($) {
+        var oTable1 =
+        $('#ajax_list')
+        //.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+        .dataTable( {
+            bAutoWidth: false,
+            "aoColumns": [
+              { "bSortable": false },
+              null, null,null,null,null,         // #! Here is very important for me to build table!!!!!!
+              { "bSortable": false }
+            ],
+            "aaSorting": [],
+            language: {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                    }
+                },
+            //,
+            //"sScrollY": "200px",
+            //"bPaginate": false,
+
+            //"sScrollX": "100%",
+            //"sScrollXInner": "120%",
+            //"bScrollCollapse": true,
+            //Note: if you are applying horizontal scrolling (sScrollX) on a ".table-bordered"
+            //you may want to wrap the table inside a "div.dataTables_borderWrap" element
+
+            //"iDisplayLength": 50
+        });
+        /**
+        var tableTools = new $.fn.dataTable.TableTools( oTable1, {
+            "sSwfPath": "../../copy_csv_xls_pdf.swf",
+            "buttons": [
+                "copy",
+                "csv",
+                "xls",
+                "pdf",
+                "print"
+            ]
+        } );
+        $( tableTools.fnContainer() ).insertBefore('#ajax_list');
+        */
+
+
+        $(document).on('click', 'th input:checkbox' , function(){
+            var that = this;
+            $(this).closest('table').find('tr > td:first-child input:checkbox')
+            .each(function(){
+                this.checked = that.checked;
+                $(this).closest('tr').toggleClass('selected');
+            });
+        });
+
+
+        $('[data-rel="tooltip"]').tooltip({placement: tooltip_placement});
+        function tooltip_placement(context, source) {
+            var $source = $(source);
+            var $parent = $source.closest('table');
+            var off1 = $parent.offset();
+            var w1 = $parent.width();
+
+            var off2 = $source.offset();
+            //var w2 = $source.width();
+
+            if( parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2) ) return 'right';
+            return 'left';
+        }
+
+
+
+        $(".submit_ajax").on('click', function (e) {
+            e.preventDefault();
+
+            $sub_name = $(this).attr('name');   // so beautiful here!
+
+            $("#dialog-confirm").removeClass('hide').dialog({
+                resizable: false,
+                modal: true,
+                title: "注意！",
+                buttons: [
+                    {
+                        html: "<i class='ace-icon fa fa-check-square-o bigger-110'></i>&nbsp; 确认！",
+                        "class": "btn btn-success btn-xs",
+                        click: function () {
+                            $(this).dialog("close");
+                            $.ajax({
+                                url: '{% url 'company_submit_ajax' %}',
+                                context: '',
+                                type: "GET",
+                                dataType: "html",
+                                data: {'sub_id': $sub_name},
+                                success: function(ans){
+                                    // $("#ajax_list").html(ans);
+                                    window.location.href="{% url "company_info_list" %}"
+                                }
+                            });
+                        }
+                    }
+                    ,
+                    {
+                        html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; 取消",
+                        "class": "btn btn-xs",
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+        });
+
+        $(".change_ajax").on('click', function (e) {
+            e.preventDefault();
+
+            $sub_name = $(this).attr('name');   // so beautiful here!
+
+            $("#dialog-confirm2").removeClass('hide').dialog({
+                resizable: false,
+                modal: true,
+                title: "注意！",
+                buttons: [
+                    {
+                        html: "<i class='ace-icon fa fa-check-square-o bigger-110'></i>&nbsp; 确认！",
+                        "class": "btn btn-success btn-xs",
+                        click: function () {
+                            $(this).dialog("close");
+                            $.ajax({
+                                url: '{% url 'company_change_ajax' %}',
+                                context: '',
+                                type: "GET",
+                                dataType: "html",
+                                data: {'sub_id': $sub_name},
+                                success: function(ans){
+                                    // $("#ajax_list").html(ans);
+                                    window.location.href="{% url "company_info_list" %}"
+                                }
+                            });
+                        }
+                    }
+                    ,
+                    {
+                        html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; 取消",
+                        "class": "btn btn-xs",
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+        });
+
+    });
+</script>
+
+
+<script type="text/javascript">
+
+    //give a new company
+    $('#new_company').click(function () {
+
+        {% if company|length > 0 %}
+        // an gritter alert
+        $.gritter.add({
+            title: '新建失败！',
+            text: '您的权限不允许再添加新的公司申报。',
+            class_name: 'gritter-error'
+        });
+        {% else %}
+        location.href = "{% url 'company_info_write' %}";
+        {% endif %}
+        return false;
+    });
+
+</script>
+
+{% endblock other_js%}

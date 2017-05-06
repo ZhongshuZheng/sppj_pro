@@ -1,0 +1,13 @@
+{% extends 'companies/company_info.html' %}
+{% load staticfiles %}
+
+
+{% block menu_js %}
+<script>
+jQuery(function($) {
+    // TO set the nav_left_list; it will be rewrite in every page
+    $('#nav_list_companyinfo_info1').attr('class', '');
+    $('#nav_list_companyinfo_info_info2').attr('class', 'active');
+});
+</script>
+{% endblock %}

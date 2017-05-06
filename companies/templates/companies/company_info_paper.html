@@ -1,0 +1,338 @@
+{% extends base %}
+{% load staticfiles %}
+
+{% block other_css %}
+<link rel="stylesheet" href="{% static "css/datepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/bootstrap-timepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/daterangepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/bootstrap-datetimepicker.css" %}" />
+{% endblock other_css %}
+
+{% block breadcurmb_detail %}
+    <li class="active">公司详情</li>    <!-- ##! maybe need to change here! -->
+{% endblock breadcurmb_detail %}
+
+{% block content %}
+    {% block menu_nav %}
+<div class="page-header">
+    <ul class="nav nav-pills">
+        <li>
+            <a href={% url 'company_info_write' %}>单位基本情况</a>
+        </li>
+        <li class="active">
+            <a href={% url 'company_info_papers_write' %}>单位相关证明</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_stackholders_write' %}>干系人情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_peoples_write' %}>技术人员情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_projects_write' %}>单位业绩情况</a>
+        </li>
+    </ul>
+</div><!-- /.page-header -->
+{% endblock menu_nav %}
+{% if success == 1 %}
+<div class="alert alert-block alert-success">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-check"></i>
+            修改成功!
+        </strong>
+    </p>
+</div>
+{% elif success == 3 %}
+<div class="alert alert-block alert-danger">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-times"></i>
+            保存失败！
+        </strong>
+        请提交100M以内的文件。
+    </p>
+</div>
+{% endif %}
+
+<form id="pw2_form" class="form-horizontal validationE" role="form"  method="post" enctype="multipart/form-data" action={% url 'company_info_papers_write' %} >
+    {% csrf_token %}
+    <!-- #section:elements.form -->
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 甲级资格证书编号</label>#}
+{#        <div class="col-sm-3">#}
+{#            <input name="{{ form.qualification.name }}" value="{{ form.qualification.value|default:"" }}" type="text" id="form-field-1"#}
+{#                   class="col-xs-10 col-sm-12 validate[required,maxSize[25]] readonly_if" />#}
+{#        </div>#}
+{##}
+{#        <label class="col-sm-1 control-label no-padding-right" for="id-date-picker-1"> 取得时间</label>#}
+{#        <div class="col-sm-5">#}
+{#            <div class="col-sm-5 input-group">#}
+{#                <input name="{{ form.qualification_date.name }}" value="{{ form.qualification_date.value|date:"Y-m-d"|default:"" }}"#}
+{#                       class="form-control date-picker validate[required] readonly_if" id="id-date-picker-1" type="text" data-date-format="yyyy-mm-dd" />#}
+{#                <span class="input-group-addon">#}
+{#                    <i class="fa fa-clock-o bigger-110"></i>#}
+{#                </span>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="form-field-2"> 水保方案编制资格证书</label>#}
+{##}
+{#        <div class="col-xs-4">#}
+{#            <input type="file" class="id-input-file-2 readonly_if" name="{{ form.qualification_file.name }}" id="form-field-2" />#}
+{#            <!-- /section:custom/file-input -->#}
+{#        </div>&nbsp;&nbsp;&nbsp;#}
+{#        {% if form.qualification_file.value %}#}
+{#        <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=qualification_file" target="_blank"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>#}
+{#        {% endif %}#}
+{#    </div>#}
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 申请报告</label>
+
+        <div class="col-sm-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.request_file.name }}"  id="form-field-1" />
+            <!-- /section:custom/file-input -->
+        </div>
+    <div class="col-sm-5">
+        <i class="bigger-150 blue col-sm-1 ace-icon fa fa-info-circle ht_download_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="上传红头盖章文件" title="" ></i>
+        {% if form.request_file.value %}
+        <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=request_file" target="_blank" class="ipreview col-sm-1" data-preview="/static/{{ form.request_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-2"> 法人资格证明</label>
+        <div class="col-sm-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.legalpersoncode_file.name }}"  id="form-field-2" />
+            <!-- /section:custom/file-input -->
+        </div>
+        <div class="col-sm-5 align-left">
+            <i class="bigger-150 blue col-sm-1 ace-icon fa fa-info-circle ht_download_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="企业法人营业执照或事业单位法人证书" title="" ></i>
+            {% if form.legalpersoncode_file.value %}
+            <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=legalpersoncode_file" target="_blank" class="ipreview col-sm-1" data-preview="/static/{{ form.legalpersoncode_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-3"> 工作场所证明</label>
+
+        <div class="col-sm-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.place_file.name }}" id="form-field-3" />
+            <!-- /section:custom/file-input -->
+        </div>
+        <div class="col-sm-5 align-left">
+            <i class="bigger-150 blue col-sm-1 ace-icon fa fa-info-circle ht_download_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="房产证明、租赁合同或其他有效证明" title="" ></i>
+            {% if form.place_file.value %}
+            <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=place_file" target="_blank" class="ipreview col-sm-1" data-preview="/static/{{ form.place_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-5"> 单位章程</label>
+
+        <div class="col-xs-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.system_file.name }}" id="form-field-5" />
+            <!-- /section:custom/file-input -->
+        </div>
+		<div class="col-sm-5 align-left">
+            <i class="bigger-150 blue col-sm-1 ace-icon fa fa-info-circle ht_download_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="单位章程" title="" ></i>
+            {% if form.system_file.value %}
+			<a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=system_file" target="_blank" class="ipreview col-sm-2" data-preview="/static/{{ form.system_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+			{% endif %}
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-7">单位质量管理认证证书</label>
+
+        <div class="col-xs-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.quality_file.name }}" id="form-field-7" />
+            <!-- /section:custom/file-input -->
+        </div>
+		<div class="col-sm-5 align-left">
+            <i class="bigger-150 blue col-sm-1 ace-icon fa fa-info-circle ht_download_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="单位章程" title="" ></i>
+            {% if form.quality_file.value %}
+			<a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=quality_file" target="_blank" class="ipreview col-sm-2" data-preview="/static/{{ form.quality_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+			{% endif %}
+        </div>
+        
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-4"> 诚信承诺书</label>
+
+        <div class="col-sm-4">
+            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.explain_file.name }}" id="form-field-4" />
+            <!-- /section:custom/file-input -->
+        </div>
+        <div class="col-sm-5 align-left">
+            <a href="{% url 'file_download' %}?FileName=explain_template" target="_blank"><i class="bigger-150 blue ace-icon col-sm-1 fa fa-info-circle ht_download_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="点击下载模板，填好后上传" title="" ></i></a>
+            {% if form.explain_file.value %}
+            <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=explain_file" target="_blank" class="ipreview col-sm-1" data-preview="/static/{{ form.explain_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+    {#        <img src="/static/{{ form.explain_file.value|cut:"assets/" }}" />#}
+            {% endif %}
+        </div>
+    </div>
+    {% comment %}<div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-6"> 质量体系认证编号</label>
+        <div class="col-sm-3">
+            <input name="{{ form.quality.name }}" value="{{ form.quality.value|default:"" }}" type="text" id="form-field-6"
+                   class="col-xs-10 col-sm-12 validate[required,maxSize[25]] readonly_if" />
+        </div>
+
+        <label class="col-sm-1 control-label no-padding-right" for="id-date-picker-2"> 取得时间</label>
+        <div class="col-sm-5">
+            <div class="col-sm-5 input-group">
+                <input name="{{ form.quality_date.name }}" value="{{ form.quality_date.value|date:"Y-m-d"|default:"" }}"
+                       class="form-control date-picker validate[required] readonly_if" id="id-date-picker-2" type="text" data-date-format="yyyy-mm-dd" />
+                <span class="input-group-addon">
+                    <i class="fa fa-clock-o bigger-110"></i>
+                </span>
+            </div>
+        </div>
+    </div>{% endcomment %}
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="form-field-7"> 营业执照文件</label>#}
+{##}
+{#        <div class="col-xs-4">#}
+{#            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.lisence_file.name }}" id="form-field-7" />#}
+{#            <!-- /section:custom/file-input -->#}
+{#        </div>&nbsp;&nbsp;&nbsp;#}
+{#        {% if form.lisence_file.value %}#}
+{#        <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=lisence_file" target="_blank"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="form-field-9"> 固定资产证明文件</label>#}
+{##}
+{#        <div class="col-xs-4">#}
+{#            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.assets_file.name }}" id="form-field-9" />#}
+{#            <!-- /section:custom/file-input -->#}
+{#        </div>&nbsp;&nbsp;&nbsp;#}
+{#        {% if form.assets_file.value %}#}
+{#        <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=assets_file" target="_blank"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>#}
+{#        {% endif %}#}
+{#    </div>#}
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="form-field-10"> 仪器设备证明文件</label>#}
+{##}
+{#        <div class="col-xs-4">#}
+{#            <input type="file" class="id-input-file-2 readonly_if file_check" name="{{ form.equipment_file.name }}" id="form-field-10" />#}
+{#            <!-- /section:custom/file-input -->#}
+{#        </div>&nbsp;&nbsp;&nbsp;#}
+{#        {% if form.equipment_file.value %}#}
+{#        <a href="{% url 'file_download' %}?CompanyKey={{ form.id.value }}&FileName=equipment_file" target="_blank"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>#}
+{#        {% endif %}#}
+{#    </div>#}
+
+
+
+
+    <div class="form-actions center">
+        {% if form.examine_statue.value == '3' %}
+        <input id="submit_btn" type="button" class="btn btn-warning" value="保存">&nbsp;&nbsp;&nbsp;
+        {% endif %}
+        <!--a class="btn btn-info" href="{% url 'user_list' %}">返回</a -->
+    </div>
+</form>
+{% endblock content %}
+
+{% block other_js %}
+
+<script src="{% static "js/date-time/bootstrap-datepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/bootstrap-timepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/moment.min.js" %}" ></script>
+<script src="{% static "js/date-time/daterangepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/bootstrap-datetimepicker.min.js" %}" ></script>
+
+<script>
+jQuery(function($) {
+
+    // If the message are submitted, make them readonly
+    {% if form.examine_statue.value != '3' %}
+    $('.readonly_if').attr('disabled', 'disabled');
+    {% endif %}
+
+    $('[data-rel=popover]').popover({container:'body'});
+
+    // file upload
+    $('.id-input-file-2 ').ace_file_input({
+					no_file:'请选择文件！',
+					btn_choose:'选择',
+					btn_change:'选择',
+					droppable:false,
+					onchange:null,
+					thumbnail:false //| true | large
+					//whitelist:'gif|png|jpg|jpeg'
+					//blacklist:'exe|php'
+					//onchange:''
+					//
+				});
+    //pre-show a file name, for example a previously selected file
+    {% if form.request_file.value %}
+        $('#form-field-1').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.legalpersoncode_file.value %}
+        $('#form-field-2').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.place_file.value %}
+        $('#form-field-3').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.system_file.value %}
+        $('#form-field-4').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.quality_file.value %}
+        $('#form-field-5').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+    {% if form.explain_file.value %}
+        $('#form-field-7').ace_file_input('show_file_list', ['已存在！']);
+    {% endif %}
+
+    //check the files for the first time.
+    $('#submit_btn').click(function () {
+        emptyfile = 0;
+        {% if firtstime == 1 %}
+            $('.id-input-file-2').each(function () {
+                if ($(this).val() == ""){
+                    emptyfile = 1;
+                }
+            });
+        {% endif %}
+        if (emptyfile == 0)
+            $('#pw2_form').submit();
+        else {
+            // an gritter alert
+            $.gritter.add({
+                title: '修改失败！',
+                text: '请检查并选择所有需要的文件。',
+                class_name: 'gritter-error'
+            });
+
+            return false;
+        }
+    });
+
+
+    //datepicker plugin
+    //link
+    $('.date-picker').datepicker({
+        autoclose: true,
+        todayHighlight: true
+    })
+    //show datepicker when clicking on the icon
+    .next().on(ace.click_event, function(){
+        $(this).prev().focus();
+    });
+
+})
+</script>
+{% block menu_js %}
+{% endblock %}
+{% endblock %}

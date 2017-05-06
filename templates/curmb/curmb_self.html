@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{# something important in this page! Look at js! #}
+
+{% block breadcurmb %}
+
+    <li>
+        <i class="ace-icon fa fa-home home-icon"></i>
+        <a href={% url 'index' %}>申请须知</a>
+    </li>
+{#    <li>#}
+{#        <a href={% url 'company_info_list' %}>公司申请</a>#}
+{#    </li>#}
+
+{% block breadcurmb_detail %}
+{% endblock breadcurmb_detail %}
+
+{% endblock breadcurmb %}
+
+
+{% block curmb_js %}
+<script>
+jQuery(function($) {
+    // TO set the nav_left_list; it will be rewrite in every page
+    $('#nav_list_companyinfo_info1').attr('class', 'active');
+    $('#nav_list_new_menulist').attr('class', 'active open');
+});
+</script>
+
+{#<script type="text/javascript">#}
+{#$(document).ready(function () {#}
+{#    $(".file_check").change(function () {#}
+{#        // 限制上传文件的类型和大小#}
+{#        // 返回 KB，保留小数点后两位#}
+{#        //alert((ele.files[0].size/(1024*1024)).toFixed(2));#}
+{#        var ele = $(this);#}
+{#        var file = ele.value;#}
+{#        if(!/.(gif|jpg|jpeg|png|GIF|JPG|bmp)$/.test(file)){#}
+{#          alert("图片类型必须是.gif,jpeg,jpg,png,bmp中的一种");#}
+{#               return false;#}
+{#         }else{#}
+{#             //alert((ele.files[0].size).toFixed(2));#}
+{#             //返回Byte(B),保留小数点后两位#}
+{#            if(((ele.files[0].size).toFixed(2))>=(50*1024*1024)){#}
+{#              alert("请上传小于50M的图片");#}
+{#              return false;#}
+{#             }#}
+{#         }#}
+{#    })#}
+{# });#}
+{#</script>#}
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".file_check").change(function () {
+            var filepath = $(this).val();
+            if (filepath == '') return false;
+            var extStart = filepath.lastIndexOf(".");
+            var ext = filepath.substring(extStart, filepath.length).toUpperCase();
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".GIF" && ext != ".JPG" && ext != ".JPEG") {
+                $.gritter.add({
+                    title: '选择失败！',
+                    text: '图片限于bmp,png,gif,jpeg,jpg格式。',
+                    class_name: 'gritter-error'
+                });
+                $(this).val('');
+                return false;
+            }
+            file_size = this.files[0].size;
+            var size = file_size / 1024;
+            if (size > 102400) {
+                $.gritter.add({
+                title: '选择失败！',
+                text: '上传的图片大小不能超过100M！',
+                class_name: 'gritter-error'
+                });
+                $(this).val('');
+            }
+        });
+    });
+</script>
+{% endblock %}

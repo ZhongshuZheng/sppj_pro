@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block breadcurmb %}
+
+    <li>
+        <i class="ace-icon fa fa-home home-icon"></i>
+        <a href={% url 'index' %}>申请须知</a>
+    </li>
+    <li>
+        <a href={% url 'company_unex_list' %}>待审核列表</a>
+    </li>
+
+{% block breadcurmb_detail %}
+{% endblock breadcurmb_detail %}
+
+{% endblock breadcurmb %}
+
+
+{% block curmb_js %}
+<script>
+jQuery(function($) {
+    // TO set the nav_left_list; it will be rewrite in every page
+    $('#nav_list_unex_list').attr('class', 'active');
+});
+</script>
+{% endblock %}

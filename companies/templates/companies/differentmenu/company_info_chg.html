@@ -1,0 +1,51 @@
+{% extends 'companies/company_info.html' %}
+{% load staticfiles %}
+
+
+
+{% block menu_nav %}
+<div class="page-header">
+    <ul class="nav nav-pills">
+        <li class="active">
+            <a href={% url 'company_info_write_chg' %}>单位基本情况</a>
+        </li>
+        {% if form.name.value == None %}
+            <li class="disabled"><a>单位相关证明</a>
+        {% else %}
+            <li><a href={% url 'company_info_papers_write_chg' %}>单位相关证明</a>
+        {% endif %}
+        </li>
+        {% if form.name.value == None %}
+            <li class="disabled"><a>干系人情况</a>
+        {% else %}<li>
+            <a href={% url 'company_info_stackholders_write_chg' %}>干系人情况</a>
+        {% endif %}
+        </li>
+        {% if form.name.value == None %}
+            <li class="disabled"><a>技术人员情况</a>
+        {% else %}
+            <li><a href={% url 'company_info_peoples_write_chg' %}>技术人员情况</a>
+        {% endif %}
+        </li>
+        {% if form.name.value == None %}
+            <li class="disabled"><a>单位业绩情况</a>
+        {% else %}
+            <li><a href={% url 'company_info_projects_write_chg' %}>单位业绩情况</a>
+        {% endif %}
+        </li>
+    </ul>
+</div><!-- /.page-header -->
+{% endblock menu_nav %}
+
+
+
+
+{% block menu_js %}
+<script>
+jQuery(function($) {
+    // TO set the nav_left_list; it will be rewrite in every page
+    $('#nav_list_companyinfo_info1').attr('class', '');
+    $('#nav_list_companyinfo_info').attr('class', 'active');
+});
+</script>
+{% endblock %}

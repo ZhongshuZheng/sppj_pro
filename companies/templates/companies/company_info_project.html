@@ -1,0 +1,438 @@
+{% extends base %}
+{% load staticfiles %}
+
+{% block other_css %}
+<link rel="stylesheet" href="{% static "css/datepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/bootstrap-timepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/daterangepicker.css" %}" />
+<link rel="stylesheet" href="{% static "css/bootstrap-datetimepicker.css" %}" />
+{% endblock other_css %}
+
+{% block breadcurmb_detail %}
+    <li><a href={% url 'company_info_projects_write' %}>单位业绩</a></li>
+    <li class="active">单位业绩详情</li>    <!-- ##! maybe need to change here! -->
+{% endblock breadcurmb_detail %}
+
+{% block content %}
+    {% block menu_nav %}
+<div class="page-header">
+    <ul class="nav nav-pills">
+        <li>
+            <a href={% url 'company_info_write' %}>单位基本情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_papers_write' %}>单位相关证明</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_stackholders_write' %}>干系人情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_peoples_write' %}>技术人员情况</a>
+        </li>
+        <li class="active">
+            <a href={% url 'company_info_projects_write' %}>单位业绩情况</a>
+        </li>
+    </ul>
+</div><!-- /.page-header -->
+
+{% endblock menu_nav %}
+
+{% if success == 1 %}
+<div class="alert alert-block alert-success">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-check"></i>
+            修改成功!
+        </strong>
+    </p>
+</div>
+{% elif success == 2 %}
+<div class="alert alert-block alert-danger">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-times"></i>
+            保存失败！
+        </strong>
+        您的批复文号在数据库中重复！
+    </p>
+</div>
+{% elif success == 3 %}
+<div class="alert alert-block alert-danger">
+    <button type="button" class="close" data-dismiss="alert">
+        <i class="ace-icon fa fa-times"></i>
+    </button>
+    <p>
+        <strong>
+            <i class="ace-icon fa fa-times"></i>
+            保存失败！
+        </strong>
+        请提交100M以内的文件。
+    </p>
+</div>
+{% endif %}
+
+<form id="pw2_form" class="form-horizontal validationE" role="form"
+      method="post" enctype="multipart/form-data" action={% url 'company_info_projects_detail_write' %} >
+    {% csrf_token %}
+    <!-- #section:elements.form -->
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 项目名称</label>
+        <div class="col-sm-9">
+            <input name="{{ form.name.name }}" value="{{ form.name.value|default:"" }}" type="text" id="form-field-1"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[100]] readonly_if" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-2"> 项目类别</label>
+        <div class="col-sm-9">
+            <input name="{{ form.itype.name }}" value="{{ form.itype.value|default:"" }}" type="text" id="form-field-2"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[10]] readonly_if" />
+        </div>
+    </div>
+{#    <div class="form-group">#}
+{#        <label class="col-sm-3 control-label no-padding-right" for="form-field-3"> 项目级别</label>#}
+{#        <div class="col-sm-9">#}
+{#            <input name="{{ form.level.name }}" value="{{ form.level.value|default:"" }}" type="text" id="form-field-3"#}
+{#                   class="col-xs-10 col-sm-5 validate[required,maxSize[10]] readonly_if" />#}
+{#        </div>#}
+{#    </div>#}
+
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="select-33"> 项目级别</label>
+        <div class="col-sm-9">
+            <select name="{{ form.level.name }}" value="{{ form.level.value|default:"" }}" type="text" id="select-33"
+                   class="col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">----</option>
+                <option value="中央立项">中央立项</option>
+                <option value="省级立项">省级立项</option>
+                <option value="市级立项">市级立项</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-4"> 项目所在地 </label>
+		<div class="col-sm-9">
+            <select name="{{ form.address_a.name }}" value="{{ form.address_a.value|default:"" }}" type="text" id="form-field-4"
+                   class="province col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">  </option>
+            </select>
+        </div>
+	</div>
+	
+	<div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-4">  </label>
+		<div class="col-sm-9">
+            <select name="{{ form.address_b.name }}" value="{{ form.address_b.value|default:"" }}" type="text" id="form-field-44"
+                   class="city col-xs-10 col-sm-5 validate[required] readonly_if" >
+                <option value="">  </option>
+            </select>
+        </div>
+	</div>
+	
+	<div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-4">  </label>
+		<div class="col-sm-9">
+            <input name="{{ form.address_c.name }}" value="{{ form.address_c.value|default:"" }}" type="text"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[50]] readonly_if" />
+        </div>
+	</div>
+
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-5"> 建设单位</label>
+        <div class="col-sm-9">
+            <input name="{{ form.build_company.name }}" value="{{ form.build_company.value|default:"" }}" type="text" id="form-field-5"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[30]] readonly_if" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-7"> 项目委托时间</label>
+        <div class="col-sm-9">
+            <div class="col-xs-10 col-sm-5  input-group">
+                <input name="{{ form.timebef.name }}" value="{{ form.timebef.value|date:"Y-m-d"|default:"" }}"
+                       class="form-control date-picker validate[required] readonly_if" id="form-field-7" type="text" data-date-format="yyyy-mm-dd" />
+                <span class="input-group-addon">
+                    <i class="fa fa-clock-o bigger-110"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-8"> 项目批复时间</label>
+        <div class="col-sm-9">
+            <div class="col-xs-10 col-sm-5  input-group">
+                <input name="{{ form.time.name }}" value="{{ form.time.value|date:"Y-m-d"|default:"" }}"
+                       class="form-control date-picker validate[required] readonly_if" id="form-field-8" type="text" data-date-format="yyyy-mm-dd" />
+                <span class="input-group-addon">
+                    <i class="fa fa-clock-o bigger-110"></i>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-6"> 项目批复部门</label>
+        <div class="col-sm-9">
+            <input name="{{ form.department.name }}" value="{{ form.department.value|default:"" }}" type="text" id="form-field-6"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[80]] readonly_if" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-9"> 项目批复文号</label>
+        <div class="col-sm-9">
+            <input name="{{ form.approval.name }}" value="{{ form.approval.value|default:"" }}" type="text" id="form-field-9"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[100]] readonly_if" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-10"> 项目批复文件</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="form-field-10" class="input_file readonly_if file_check" name="{{ form.approval_a_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.approval_a_file.value %}
+        <a href="{% url 'file_download' %}?ProjectKey={{ form.approval.value }}&FileName=approval_a_file&Project=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.approval_a_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-100"> 项目报告封面</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="form-field-100" class="input_file readonly_if file_check" name="{{ form.approval_b_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.approval_b_file.value %}
+        <a href="{% url 'file_download' %}?ProjectKey={{ form.approval.value }}&FileName=approval_b_file&Project=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.approval_b_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-101"> 项目责任页</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="form-field-101" class="input_file readonly_if file_check" name="{{ form.approval_c_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.approval_c_file.value %}
+        <a href="{% url 'file_download' %}?ProjectKey={{ form.approval.value }}&FileName=approval_c_file&Project=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.approval_c_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-12"> 项目合同额</label>
+        <div class="col-sm-9">
+            <input name="{{ form.investment.name }}" value="{{ form.investment.value|default:"" }}" type="text" id="form-field-12"
+                   class="col-xs-10 col-sm-5 validate[required,maxSize[10]] readonly_if" />
+            <i class="bigger-150 blue ace-icon fa fa-info-circle ht_help_icon" data-rel="popover" data-trigger="hover" data-placement="right" data-content="单位：万元" title="" ></i>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-3 control-label no-padding-right" for="form-field-13"> 项目合同书</label>
+
+        <div class="col-xs-4">
+            <input type="file" id="form-field-13" class="input_file readonly_if file_check" name="{{ form.contract_file.name }}" />
+            <!-- /section:custom/file-input -->
+        </div>&nbsp;&nbsp;&nbsp;
+        {% if form.contract_file.value %}
+        <a href="{% url 'file_download' %}?ProjectKey={{ form.approval.value }}&FileName=contract_file&Project=ye" target="_blank" class="ipreview" data-preview="/static/{{ form.contract_file.value|cut:"assets/" }}"><i class="bigger-150 green ace-icon fa fa-download ht_download_icon"></i></a>
+        {% endif %}
+    </div>
+
+
+    <div class="form-actions center">
+        {% if examine_statue == '3' %}
+        <input type="hidden" name="ori_approval" value='{{ form.approval.value|default:"null"}}' />
+        <input id="submit_btn" type="button" class="btn btn-warning" value="保存">&nbsp;&nbsp;&nbsp;
+        {% endif %}
+    </div>
+
+</form>
+{% endblock content %}
+
+{% block other_js %}
+
+<script src="{% static "js/date-time/bootstrap-datepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/bootstrap-timepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/moment.min.js" %}" ></script>
+<script src="{% static "js/date-time/daterangepicker.min.js" %}" ></script>
+<script src="{% static "js/date-time/bootstrap-datetimepicker.min.js" %}" ></script>
+
+<script>
+
+jQuery(function($) {
+
+    // If the message are submitted, make them readonly
+    {% if examine_statue != '3' %}
+    $('.readonly_if').attr('disabled', 'disabled');
+    {% endif %}
+
+    // unique idnum for first time
+{#    {% if firtstime == 1 %}#}
+{#    $('#form-field-13').attr('class', 'col-xs-10 col-sm-5 validate[required,maxSize[18],minSize[18],ajax[ajaxIdnumRepeatA]]');#}
+{#    {% endif %}#}
+
+    // file upload
+    $('.input_file ').ace_file_input({
+					no_file:'请选择文件！',
+					btn_choose:'选择',
+					btn_change:'选择',
+					droppable:false,
+					onchange:null,
+					thumbnail:false //| true | large
+					//whitelist:'gif|png|jpg|jpeg'
+					//blacklist:'exe|php'
+					//onchange:''
+					//
+				});
+    //pre-show a file name, for example a previously selected file
+    {% if form.approval_a_file.value %}$('#form-field-10').ace_file_input('show_file_list', ['已存在！']);{% endif %}
+    {% if form.approval_b_file.value %}$('#form-field-100').ace_file_input('show_file_list', ['已存在！']);{% endif %}
+    {% if form.approval_c_file.value %}$('#form-field-101').ace_file_input('show_file_list', ['已存在！']);{% endif %}
+    {% if form.contract_file.value %}$('#form-field-13').ace_file_input('show_file_list', ['已存在！']);{% endif %}
+
+    //check the files for the first time.
+    $('#submit_btn').click(function () {
+        emptyfile = 0;
+        {% if firtstime == 1 %}
+            $('.input_file').each(function () {
+                if ($(this).val() == ""){
+                    emptyfile = 1;
+                }
+            });
+        {% endif %}
+        if (emptyfile == 0)
+            $('#pw2_form').submit();
+        else {
+            // an gritter alert
+            $.gritter.add({
+                title: '修改失败！',
+                text: '请检查并选择所有需要的文件。',
+                class_name: 'gritter-error'
+            });
+
+            return false;
+        }
+    });
+
+    $('[data-rel=popover]').popover({container:'body'});
+
+    //datepicker plugin
+    //link
+    $('.date-picker').datepicker({
+        autoclose: true,
+        todayHighlight: true
+    })
+    //show datepicker when clicking on the icon
+    .next().on(ace.click_event, function(){
+        $(this).prev().focus();
+    });
+
+// the js about the address:
+var pro = ["北京","天津","上海","重庆","河北","山西","辽宁",
+    "吉林","黑龙江","江苏","浙江","安徽","福建","江西","山东","河南","湖北",
+    "湖南","广东","海南","四川","贵州","云南","陕西","甘肃","青海",
+    "内蒙古","广西","西藏","宁夏","新疆维吾尔自治区","香港","澳门","台湾"];
+
+var city = {北京:["东城区","西城区","崇文区","宣武区","朝阳区","海淀区","丰台区","石景山区","房山区","通州区","顺义区","昌平区","大兴区","怀柔区","平谷区","门头沟区","密云县","延庆县"],
+    天津:["和平区","河东区","河西区","南开区","河北区","红桥区","东丽区","西青区","北辰区","津南区","武清区","宝坻区","滨海新区","静海县","宁河县","蓟县"],
+    上海:["黄浦区","卢湾区","徐汇区","长宁区","静安区","普陀区","闸北区","虹口区","杨浦区","闵行区","宝山区","嘉定区","浦东新区","金山区","松江区","青浦区","奉贤区","崇明县"],
+    重庆:["渝中区","大渡口区","江北区","南岸区","北碚区","渝北区","巴南区","长寿区","双桥区","沙坪坝区","万盛区","万州区","涪陵区","黔江区","永川区","合川区","江津区","九龙坡区","南川区","綦江县","潼南县","荣昌县","璧山县","大足县","铜梁县","梁平县","开县","忠县","城口县","垫江县","武隆县","丰都县","奉节县","云阳县","巫溪县","巫山县","石柱土家族自治县","秀山土家族苗族自治县","酉阳土家族苗族自治县","彭水苗族土家族自治县"],
+    河北:["石家庄","唐山","秦皇岛","邯郸","邢台","保定","张家口","承德","沧州","廊坊","衡水"],
+    山西:["太原","大同","阳泉","长治","晋城","朔州","晋中","运城","忻州","临汾","吕梁"],
+    辽宁:["沈阳","大连","鞍山","抚顺","本溪","丹东","锦州","营口","阜新","辽阳","盘锦","铁岭","朝阳","葫芦岛"],
+    吉林:["长春","吉林","四平","辽源","通化","白山","松原","白城","延边朝鲜族自治州"],
+    黑龙江:["哈尔滨","齐齐哈尔","鹤岗","双鸭山","鸡西","大庆","伊春","牡丹江","佳木斯","七台河","黑河","绥化","大兴安岭"],
+    江苏:["南京","苏州","无锡","常州","镇江","南通","泰州","扬州","盐城","连云港","徐州","淮安","宿迁"],
+    浙江:["杭州","宁波","温州","嘉兴","湖州","绍兴","金华","衢州","舟山","台州","丽水"],
+    安徽:["合肥","芜湖","蚌埠","淮南","马鞍山","淮北","铜陵","安庆","黄山","滁州","阜阳","宿州","巢湖","六安","亳州","池州","宣城"],
+    福建:["福州","厦门","莆田","三明","泉州","漳州","南平","龙岩","宁德"],
+    江西:["南昌","景德镇","萍乡","九江","新余","鹰潭","赣州","吉安","宜春","抚州","上饶"],
+    山东:["济南","青岛","淄博","枣庄","东营","烟台","潍坊","济宁","泰安","威海","日照","莱芜","临沂","德州","聊城","滨州","菏泽"],
+    河南:["郑州","开封","洛阳","平顶山","安阳","鹤壁","新乡","焦作","濮阳","许昌","漯河","三门峡","南阳","商丘","信阳","周口","驻马店"],
+    湖北:["武汉","黄石","十堰","荆州","宜昌","襄樊","鄂州","荆门","孝感","黄冈","咸宁","随州","恩施"],
+    湖南:["长沙","株洲","湘潭","衡阳","邵阳","岳阳","常德","张家界","益阳","郴州","永州","怀化","娄底","湘西"],
+    广东:["广州","深圳","珠海","汕头","韶关","佛山","江门","湛江","茂名","肇庆","惠州","梅州","汕尾","河源","阳江","清远","东莞","中山","潮州","揭阳","云浮"],
+    海南:["海口","三亚"],
+    四川:["成都","自贡","攀枝花","泸州","德阳","绵阳","广元","遂宁","内江","乐山","南充","眉山","宜宾","广安","达州","雅安","巴中","资阳","阿坝","甘孜","凉山"],
+    贵州:["贵阳","六盘水","遵义","安顺","铜仁","毕节","黔西南","黔东南","黔南"],
+    云南:["昆明","曲靖","玉溪","保山","昭通","丽江","普洱","临沧","德宏","怒江","迪庆","大理","楚雄","红河","文山","西双版纳"],
+    陕西:["西安","铜川","宝鸡","咸阳","渭南","延安","汉中","榆林","安康","商洛"],
+    甘肃:["兰州","嘉峪关","金昌","白银","天水","武威","酒泉","张掖","庆阳","平凉","定西","陇南","临夏","甘南"],
+    青海:["西宁","海东","海北","海南","黄南","果洛","玉树","海西"],
+    内蒙古:["呼和浩特","包头","乌海","赤峰","通辽","鄂尔多斯","呼伦贝尔","巴彦淖尔","乌兰察布","锡林郭勒盟","兴安盟","阿拉善盟"],
+    广西:["南宁","柳州","桂林","梧州","北海","防城港","钦州","贵港","玉林","百色","贺州","河池","来宾","崇左"],
+    西藏:["拉萨","那曲","昌都","林芝","山南","日喀则","阿里"],
+    宁夏:["银川","石嘴山","吴忠","固原","中卫"],
+    新疆维吾尔自治区:["乌鲁木齐","克拉玛依","吐鲁番","哈密","和田","阿克苏","喀什","克孜勒苏","巴音郭楞","昌吉","博尔塔拉","伊犁","塔城","阿勒泰"],
+    香港:["香港岛","九龙东","九龙西","新界东","新界西"],
+    澳门:["澳门半岛","离岛"],
+    台湾:["台北","高雄","基隆","新竹","台中","嘉义","台南市"]};
+$(document).ready(function(){
+    for(var i=0;i<pro.length;i++){
+        $option=$("<option/>");
+        $option.attr("value",pro[i]);
+        $option.text(pro[i]);
+        $(".province").append($option);
+    }
+});
+$(".province").change(function(){
+    var cities=city[$(this).val()];
+    $(".city").empty();
+    for(var i in cities){
+        $option=$("<option />");
+        $option.attr("value", cities[i]);
+        $option.text(cities[i]);
+        $(".city").append($option);
+    }
+});
+
+//set the select input default
+//获得后台的值,把相应的select的option选为默认的值
+$(document).ready(function(){
+    selectCheckPayStats("form-field-4","{{ form.address_a.value|default:"" }}");
+    var cities=city[$(".province").val()];
+    $(".city").empty();
+    for(var i in cities){
+        $option=$("<option />");
+        $option.attr("value", cities[i]);
+        $option.text(cities[i]);
+        $(".city").append($option);
+    }
+    selectCheckPayStats("form-field-44","{{ form.address_b.value|default:"" }}");
+    selectCheckPayStats("select-33","{{ form.level.value|default:"" }}");
+});
+//修改select的option默认显示项的方法
+function selectCheckPayStats(id, value){
+    //获得下拉列表的id
+    var select = document.getElementById(id);
+    //获得下拉列表的所有option
+    var options = select.options;
+    //循环获得对应的节点
+    for(var i=0;i<options.length;i++)
+    {
+        //获得节点的值和后台传来的值进行比较
+        if (options[i].value == value)
+        {
+        //如果当前节点与后台传来的值一致，则将当前节点设置为选中状态，并跳出循环
+        options[i].selected = true;
+        break;
+        }
+    }
+}
+})
+</script>
+{% block menu_js %}
+<script>
+jQuery(function($) {
+    // TO set the nav_left_list; it will be rewrite in every page
+    $('#nav_list_companyinfo_info1').attr('class', '');
+    $('#nav_list_companyinfo_info').attr('class', 'active');
+});
+</script>
+{% endblock %}
+{% endblock %}

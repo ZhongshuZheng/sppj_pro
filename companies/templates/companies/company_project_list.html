@@ -1,0 +1,290 @@
+{% extends base %}
+{% load staticfiles %}
+
+{# #! in this page #}
+{#{% block title %}Index{% endblock title %}#}
+
+{% block breadcurmb_detail %}
+    <li class="active">单位业绩列表</li>    <!-- ##! maybe need to change here! -->
+{% endblock breadcurmb_detail %}
+
+{% block content %}
+    {% block menu_nav %}
+<div class="page-header">
+    <ul class="nav nav-pills">
+        <li>
+            <a href={% url 'company_info_write' %} >单位基本情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_papers_write' %}>单位相关证明</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_stackholders_write' %}>干系人情况</a>
+        </li>
+        <li>
+            <a href={% url 'company_info_peoples_write' %}>技术人员情况</a>
+        </li>
+        <li class="active">
+            <a href={% url 'company_info_projects_write' %}>单位业绩情况</a>
+        </li>
+    </ul>
+</div><!-- /.page-header -->
+{% endblock menu_nav %}
+
+{% if company.examine_statue == '3' %}
+<button class="btn btn-success btn-xs" id="new_project">
+<i class="ace-icon fa  fa-pencil-square-o bigger-160"></i>添加</button><br /><br />
+{% endif %}
+
+<div class="table-header">
+    单位业绩列表
+</div>
+
+<!-- <div class="table-responsive"> -->
+
+<!-- <div class="dataTables_borderWrap"> -->
+<div>
+    <table id="ajax_list" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th class="center">
+                    <label class="position-relative">
+                        <input type="checkbox" class="ace" />
+                        <span class="lbl"></span>
+                    </label>
+                </th>
+                <th>项目名称</th>
+                <th>项目类别</th>
+                <th class="hidden-480">项目级别</th>
+                <th class="hidden-480">项目所在地</th>
+                <th class="hidden-480">批复时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for a in list %}
+            <tr id={{ a.approval }}>
+                <td class="center">
+                    <label class="position-relative">
+                        <input type="checkbox" class="ace" />
+                        <span class="lbl"></span>
+                    </label>
+                </td>
+
+                <td>{{ a.name }}</td>
+                <td>{{ a.itype }}</td>
+                <td class="hidden-480">{{ a.level }}</td>
+                <td class="hidden-480">{{ a.address_a }}{{ a.address_b }}{{ a.address_c }}</td>
+                <td class="hidden-480">{{ a.time|date:"Y-m-d" }}</td>
+                <td>
+                    <div class="hidden-sm hidden-xs action-buttons">
+                        {% if company.examine_statue == '3' %}
+
+                        <form class="form-inline" method="post" action={% url 'company_info_projects_write' %}>
+                            {% csrf_token %}
+                            <input type="hidden" name="a_approval" value="{{ a.approval }}" />
+                            <input type="submit" class="btn btn-info btn-minier" value="编辑" />
+                            <button name="{{ a.approval }}" type="button" class="btn btn-danger btn-minier del_ajax">删除</button>
+                        </form>
+                        {% else %}
+                        <form class="form-inline" method="post" action={% url 'company_info_projects_write' %}>
+                            {% csrf_token %}
+                            <input type="hidden" name="a_approval" value="{{ a.approval }}" />
+                            <input type="submit" class="btn btn-warning btn-minier" value="查看" />
+                        </form>
+                        {% endif %}
+                    </div>
+
+
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div id="dialog-confirm" class="hide">
+        <div class="alert alert-info bigger-110">
+            删除这个编制工作的信息。
+        </div>
+
+        <div class="space-6"></div>
+
+        <p class="bigger-110 bolder center grey">
+            <i class="ace-icon fa fa-hand-o-right blue bigger-120"></i>
+            你确定吗？
+        </p>
+    </div><!-- #dialog-confirm -->
+
+{% endblock content %}
+
+{% block other_js %}
+
+<script>
+    jQuery(function($) {
+        // TO set the nav_left_list; it will be rewrite in every page
+        $('#nav_list_companyinfo_info_list').attr('class', 'active');
+    })
+</script>
+
+<!-- page specific plugin scripts -->
+<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
+<script src="{% static "js/jquery.dataTables.bootstrap.js" %}"></script>
+
+
+<script src="{% static "js/jquery-ui.min.js" %}" ></script>
+<script src="{% static "js/jquery.ui.touch-punch.min.js" %}" ></script>
+
+<!-- inline scripts related to this page -->
+<script type="text/javascript">
+
+    jQuery(function($) {
+        var oTable1 =
+        $('#ajax_list')
+        //.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+        .dataTable( {
+            bAutoWidth: false,
+            "aoColumns": [
+              { "bSortable": false },
+              null, null,null,null,null,         // #! Here is very important for me to build table!!!!!!
+              { "bSortable": false }
+            ],
+            "aaSorting": [],
+            language: {
+                "sProcessing": "处理中...",
+                "sLengthMenu": "显示 _MENU_ 项结果",
+                "sZeroRecords": "没有匹配结果",
+                "sInfo": "显示第 _START_ 至 _END_ 项结果，共 _TOTAL_ 项",
+                "sInfoEmpty": "显示第 0 至 0 项结果，共 0 项",
+                "sInfoFiltered": "(由 _MAX_ 项结果过滤)",
+                "sInfoPostFix": "",
+                "sSearch": "搜索:",
+                "sUrl": "",
+                "sEmptyTable": "表中数据为空",
+                "sLoadingRecords": "载入中...",
+                "sInfoThousands": ",",
+                "oPaginate": {
+                    "sFirst": "首页",
+                    "sPrevious": "上页",
+                    "sNext": "下页",
+                    "sLast": "末页"
+                    }
+                }
+            //,
+            //"sScrollY": "200px",
+            //"bPaginate": false,
+
+            //"sScrollX": "100%",
+            //"sScrollXInner": "120%",
+            //"bScrollCollapse": true,
+            //Note: if you are applying horizontal scrolling (sScrollX) on a ".table-bordered"
+            //you may want to wrap the table inside a "div.dataTables_borderWrap" element
+
+            //"iDisplayLength": 50
+        });
+        /**
+        var tableTools = new $.fn.dataTable.TableTools( oTable1, {
+            "sSwfPath": "../../copy_csv_xls_pdf.swf",
+            "buttons": [
+                "copy",
+                "csv",
+                "xls",
+                "pdf",
+                "print"
+            ]
+        } );
+        $( tableTools.fnContainer() ).insertBefore('#ajax_list');
+        */
+
+
+        $(document).on('click', 'th input:checkbox' , function(){
+            var that = this;
+            $(this).closest('table').find('tr > td:first-child input:checkbox')
+            .each(function(){
+                this.checked = that.checked;
+                $(this).closest('tr').toggleClass('selected');
+            });
+        });
+
+
+        $('[data-rel="tooltip"]').tooltip({placement: tooltip_placement});
+        function tooltip_placement(context, source) {
+            var $source = $(source);
+            var $parent = $source.closest('table')
+            var off1 = $parent.offset();
+            var w1 = $parent.width();
+
+            var off2 = $source.offset();
+            //var w2 = $source.width();
+
+            if( parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2) ) return 'right';
+            return 'left';
+        }
+
+    });
+</script>
+
+
+<script type="text/javascript">
+
+    //give a new company
+    $('#new_project').click(function () {
+
+        location.href = "{% url 'company_info_projects_detail_write' %}";
+        return false;
+    });
+
+</script>
+
+
+<script type="text/javascript">
+// the delete button
+    jQuery(function($) {
+
+        $(".del_ajax").on('click', function (e) {
+            e.preventDefault();
+
+            $del_name = $(this).attr('name');   // so beautiful here!
+
+            $("#dialog-confirm").removeClass('hide').dialog({
+                resizable: false,
+                modal: true,
+                title: "注意！",
+                buttons: [
+                    {
+                        html: "<i class='ace-icon fa fa-trash-o bigger-110'></i>&nbsp; 确认！",
+                        "class": "btn btn-danger btn-xs",
+                        click: function () {
+                            $(this).dialog("close");
+                            $.ajax({
+                                url: '{% url 'project_delete_ajax' %}',
+                                context: '',
+                                type: "GET",
+                                dataType: "html",
+                                data: {'del_id': $del_name},
+                                success: function(ans){
+                                    // $("#ajax_list").html(ans);
+                                    $('#ajax_list').dataTable().fnDeleteRow($("#" + $del_name));
+                                    // $("#" + $del_name).remove();
+                                }
+                            });
+                        }
+                    }
+                    ,
+                    {
+                        html: "<i class='ace-icon fa fa-times bigger-110'></i>&nbsp; 取消",
+                        "class": "btn btn-xs",
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+        });
+    })
+</script>
+
+{% block menu_js %}
+{% endblock %}
+{% endblock other_js%}
